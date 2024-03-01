@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  test_tasks:
+    container_name: test_tasks
+    build:
+      context: ../test-task
+      dockerfile: Dockerfile
+    env_file: ['.env']
+    ports:
+      - 5000:5000
+    command: npm run start
+    restart: always
+    depends_on:
+      - postgres
+    networks:
+      - ms-network
+
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    env_file: [ .env ]
+    volumes:
+      - ./volumes/postgres:/var/lib/postgresql/data
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    networks:
+      - ms-network
+
+networks:
+  ms-network:
